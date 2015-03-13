@@ -1,7 +1,5 @@
 headers = ngx.req.get_headers();
 
-
-
 function get_user()
 
    local header =  headers['Authorization']
@@ -22,26 +20,28 @@ function get_user()
    divider = auth:find(':')
    local user = auth:sub(0, divider-1)
    local pass = auth:sub(divider+1)
-   ngx.log(1, ngx.var.users)
-   if ngx.var.users[user] ~= pass then
-      return
-   end
-   
+
+-- erich: add back in to ensure we check the user and don't accept everything
+--   ngx.log(1, ngx.var.users)
+--   if ngx.var.users[user] ~= pass then
+--      return
+--   end
+
    return user
 end
 
 function set_cookie()
    local expires_after = 3600
    local expiration = ngx.time() + expires_after
-   local token = expiration .. ":" .. ngx.encode_base64(ngx.hmac_sha1(
-       ngx.var.lua_auth_secret,
-       expiration))
+   local token = expiration .. ":" .. ngx.encode_base64(ngx.hmac_sha1(ngx.var.lua_auth_secret, expiration))
    local cookie = "Auth=" .. token .. "; "
    -- @TODO: Don't include subdomains
-   cookie = cookie .. "Path=/; Domain=" .. ngx.var.server_name .. "; "
+   --cookie = cookie .. "Path=/; Domain=" .. ngx.var.server_name .. "; "
+   cookie = cookie .. "Path=/; Domain=.local.local ; "
    cookie = cookie .. "Expires=" .. ngx.cookie_time(expiration) .. "; "
    cookie = cookie .. "; Max-Age=" .. expires_after .. "; HttpOnly"
    ngx.header['Set-Cookie'] = cookie
+   ngx.log(ngx.INFO, ngx.headers)
 end
 
 local user = get_user()
@@ -51,6 +51,7 @@ if user then
    set_cookie()
    ngx.header.content_type = 'text/html'
    ngx.say("<html><head><script>location.reload()</script></head></html>")
+   --ngx.redirect("/")
 else
    ngx.header.content_type = 'text/plain'
    ngx.header.www_authenticate = 'Basic realm=""'
