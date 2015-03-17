@@ -1,8 +1,9 @@
 local json = require "cjson"
+local str = require "resty.string"
 
 expires_after = 3600
 
-headers = ngx.req.get_headers();
+--headers = ngx.req.get_headers();
 user = ngx.var.arg_user
 pw = ngx.var.arg_pw
 
@@ -15,21 +16,24 @@ if user ~= nil and pw ~= nil then
 --   if ngx.var.users[user] ~= pass then
 --      return
 --   end
+   ngx.log(ngx.STDERR, "Got user: " .. user)
+   
+--   if ngx.var.users[user] ~= pass then
+   if user == "erich" and pw == "yo" then
+      ngx.log(ngx.STDERR, 'Authenticated' .. user)
+      local expiration = ngx.time() + expires_after
+      local token = expiration .. ":" .. str.to_hex(ngx.hmac_sha1(ngx.var.lua_auth_secret, expiration))
 
-   ngx.log(ngx.STDERR, 'Authenticated' .. user)
-   local expiration = ngx.time() + expires_after
-   local token = expiration .. ":" .. ngx.encode_base64(ngx.hmac_sha1(ngx.var.lua_auth_secret, expiration))
+      local jsonStr = json.encode{ token = token }
+      ngx.header.content_type = 'application/json'
+      ngx.say(jsonStr)
+      ngx.log(ngx.STDERR, "token: " .. token)
+      return
+   end
 
-   local jsonStr = json.encode{ token = token }
-   ngx.header.content_type = 'application/json'
-   ngx.say(jsonStr)
-   ngx.log(ngx.STDERR, "token: " .. token)
+end 
 
-else 
+ngx.header.content_type = 'text/plain'
+ngx.status = ngx.HTTP_UNAUTHORIZED
+ngx.say('401 Access Denied')
 
-   ngx.header.content_type = 'text/plain'
-   ngx.header.www_authenticate = 'Basic realm=""'
-   ngx.status = ngx.HTTP_UNAUTHORIZED
-   ngx.say('401 Access Denied')
-
-end

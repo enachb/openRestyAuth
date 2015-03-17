@@ -1,3 +1,5 @@
+    local str = require "resty.string"
+
 
     ngx.log(ngx.STDERR,"XXXXXXXXXX entering checkToken.lua ")
 
@@ -15,10 +17,10 @@
             -- If there's a token, split off the HMAC signature
             -- and timestamp.
             local divider = token:find(":")
-            hmac = ngx.decode_base64(token:sub(divider+1))
+            hmac = token:sub(divider+1)
             timestamp = token:sub(0, divider-1)
             -- Verify that the signature is valid.
-            if ngx.hmac_sha1(ngx.var.lua_auth_secret, timestamp) == hmac and tonumber(timestamp) >= ngx.time() then
+            if str.to_hex(ngx.hmac_sha1(ngx.var.lua_auth_secret, timestamp)) == hmac and tonumber(timestamp) >= ngx.time() then
                 ngx.log(ngx.STDERR,"Token verified ")
                 return true
             else
