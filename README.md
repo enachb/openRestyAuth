@@ -1,6 +1,14 @@
 # openRestyAuth
 Sample openresty implementation on how to login, issue tokens and check authorizations
 
+## Installation of Openresty
+If you downloaded it from [here](http://openresty.org/), you can just follow the installation instructions.
+If you downloaded/installed it from another source like homebrew you most likely will need to change the path below to start it (or need no path).
+
+## Start Openresty
+Make sure to change into the directory of the project before you start it:
+`/usr/local/openresty/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf`
+
 ## Request a token
 
 `
