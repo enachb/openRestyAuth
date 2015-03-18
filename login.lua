@@ -1,33 +1,28 @@
 local json = require "cjson"
 local str = require "resty.string"
 
+users = { sum = "TingWong", wi = "ToLo", ho = "LeeFuk", oink = "oink" }
+
 expires_after = 3600
 
 --headers = ngx.req.get_headers();
 user = ngx.var.arg_user
 pw = ngx.var.arg_pw
 
--- got user
+-- got user and password in URL
 if user ~= nil and pw ~= nil then
-
--- erich: add back in to ensure we check the user and don't accept everything
--- accept any user for now
---   ngx.log(1, ngx.var.users)
---   if ngx.var.users[user] ~= pass then
---      return
---   end
-   ngx.log(ngx.STDERR, "Got user: " .. user)
-   
---   if ngx.var.users[user] ~= pass then
-   if user == "erich" and pw == "yo" then
-      ngx.log(ngx.STDERR, 'Authenticated' .. user)
+   ngx.log(ngx.DEBUG, "Got user: " .. user)
+  
+   if users[user] ~= pass then
+--   if user == "erich" and pw == "yo" then
+      ngx.log(ngx.DEBUG, 'Authenticated' .. user)
       local expiration = ngx.time() + expires_after
       local token = expiration .. ":" .. str.to_hex(ngx.hmac_sha1(ngx.var.lua_auth_secret, expiration))
 
       local jsonStr = json.encode{ token = token }
       ngx.header.content_type = 'application/json'
       ngx.say(jsonStr)
-      ngx.log(ngx.STDERR, "token: " .. token)
+      ngx.log(ngx.DEBUG, "token: " .. token)
       return
    end
 
