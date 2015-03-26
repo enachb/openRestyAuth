@@ -6,8 +6,7 @@
     local hmac = ""
     local timestamp = ""
 
-    -- Check that there is a token
-    local token = ngx.var.arg_token
+    local header = ngx.req.get_headers()
 
     function checkToken(token)
         -- Check that the token exists.
@@ -28,14 +27,16 @@
         return false
     end
 
-    if token ~= nil then
-        ngx.log(ngx.DEBUG,"XXXXXXXXXX Found  token: " .. ngx.var.arg_token)
+    if header ~= nil and header["Authorization"] ~= nil then
+
+        local token = header["Authorization"]
+        ngx.log(ngx.DEBUG,"XXXXXXXXXX Found  token: " .. token)
         -- if you want to catch an exception it has to be a function wrapped in pcall
         local noException, validToken= pcall(checkToken, token)
  
         if noException and validToken then 
             -- verified token
-            ngx.log(ngx.DEBUG,"Supplied token ok." .. ngx.var.arg_token)
+            ngx.log(ngx.DEBUG,"Supplied token ok." .. token)
             return
         else
             -- no go
