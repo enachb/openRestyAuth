@@ -13,7 +13,7 @@ pw = ngx.var.arg_pw
 if user ~= nil and pw ~= nil then
    ngx.log(ngx.DEBUG, "Got user: " .. user)
   
-   if users[user] ~= pass then
+   if users[user] == pw then
 --   if user == "erich" and pw == "yo" then
       ngx.log(ngx.DEBUG, 'Authenticated' .. user)
       local expiration = ngx.time() + expires_after
