@@ -7,6 +7,8 @@ If you downloaded/installed it from another source like homebrew you most likely
 
 ## Start Openresty
 Make sure to change into the directory of the project before you start it:
+"sudo openresty -p `pwd` -c conf/nginx.conf"
+-
 `/usr/local/openresty/nginx/sbin/nginx -p `pwd` -c conf/nginx.conf`
 
 ## Request a token
