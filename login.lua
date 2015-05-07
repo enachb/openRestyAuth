@@ -3,7 +3,7 @@ local str = require "resty.string"
 
 users = { sum = "TingWong", wi = "ToLo", ho = "LeeFuk", oink = "oink" }
 
-expires_after = 3600
+expires_after = 43200
 
 --headers = ngx.req.get_headers();
 user = ngx.var.arg_user
